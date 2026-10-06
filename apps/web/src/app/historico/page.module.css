@@ -1,0 +1,7 @@
+.page { min-height: 100dvh; }
+.header { display: flex; justify-content: space-between; align-items: center; height: var(--header-h); padding: 0 16px; width: min(1120px, 100%); margin-inline: auto; }
+.nav { display: flex; align-items: center; gap: 4px; }
+.nav a { font-size: var(--t-sm); color: var(--ink-2); text-decoration: none; padding: 8px 10px; border-radius: 10px; }
+.nav a:hover { color: var(--ink); background: var(--hover); }
+.main { width: min(1088px, 100% - 32px); margin: 0 auto; padding: 24px 0 calc(110px + env(safe-area-inset-bottom)); }
+.title { margin: 8px 0 28px; font-size: clamp(1.9rem, 6vw, 3rem); font-weight: 800; font-variation-settings: 'wdth' 118; letter-spacing: -0.03em; line-height: 1.02; max-width: 18ch; }

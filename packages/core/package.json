@@ -1,0 +1,8 @@
+{
+  "name": "@reposta/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "description": "Dominio compartido de REPOSTA (web + Android): sin DOM ni dependencias."
+}

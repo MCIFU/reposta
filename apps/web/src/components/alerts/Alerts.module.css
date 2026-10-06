@@ -1,0 +1,50 @@
+.bell { position: relative; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; border: 0; background: transparent; color: var(--ink-2); }
+.bell:hover { background: var(--hover); color: var(--ink); }
+.bell svg { width: 21px; height: 21px; }
+.badge { position: absolute; top: 4px; right: 3px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--rp-caro); color: #fff; font-size: 10.5px; font-weight: 800; display: grid; place-items: center; border: 2px solid var(--bg); }
+
+.toast {
+  position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); top: calc(var(--header-h) + 10px); width: min(440px, calc(100% - 24px));
+  display: flex; align-items: flex-start; gap: 8px; padding: 12px 12px 12px 16px; border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-float);
+  border-left: 4px solid var(--brand); animation: drop var(--dur-2) var(--ease-out);
+}
+.toast[data-dir='down'], .toast[data-dir='below'] { border-left-color: var(--rp-barato); }
+.toast[data-dir='up'] { border-left-color: var(--rp-caro); }
+.toast a { flex: 1; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 2px; }
+.toast span { font-size: var(--t-sm); color: var(--ink-2); }
+.toast button { border: 0; background: none; font-size: 1.3rem; line-height: 1; color: var(--ink-2); padding: 2px 6px; }
+@keyframes drop { from { opacity: 0; transform: translate(-50%, -8px); } }
+
+.panel { border: 0; padding: 0; margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(440px, 100%); background: var(--bg); color: var(--ink); box-shadow: var(--shadow-float); }
+.panel::backdrop { background: rgb(10 22 48 / 0.4); }
+.panel[open] { animation: slide var(--dur-2) var(--ease-out); }
+@keyframes slide { from { transform: translateX(24px); opacity: 0; } }
+.inner { padding: 20px 20px 40px; display: flex; flex-direction: column; gap: 18px; }
+.head { display: flex; justify-content: space-between; align-items: center; }
+.head h2 { margin: 0; font-size: var(--t-xl); font-weight: 750; }
+.close { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--surface); font-size: 1.4rem; color: var(--ink); }
+.note { margin: -8px 0 0; font-size: var(--t-xs); color: var(--ink-2); }
+.ok { margin: -6px 0 0; font-size: var(--t-xs); color: var(--ok-ink); font-weight: 600; }
+.panel h3 { margin: 0 0 8px; font-size: var(--t-md); font-weight: 700; }
+.secHead { display: flex; justify-content: space-between; align-items: baseline; }
+.link, .inlineLink { border: 0; background: none; padding: 0; color: var(--brand); font-weight: 650; font-size: var(--t-sm); }
+.empty { margin: 0; font-size: var(--t-sm); color: var(--ink-2); }
+.events, .alerts { list-style: none; margin: 0; padding: 0; }
+.events li { border-left: 3px solid var(--line); margin-bottom: 8px; border-radius: 4px; }
+.events li[data-dir='down'], .events li[data-dir='below'] { border-left-color: var(--rp-barato); }
+.events li[data-dir='up'] { border-left-color: var(--rp-caro); }
+.events li[data-unread] { background: var(--hover); }
+.events a { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; text-decoration: none; color: inherit; }
+.events span, .events time { font-size: var(--t-xs); color: var(--ink-2); }
+.alerts li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.alerts li div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.alerts li span { font-size: var(--t-xs); color: var(--ink-2); }
+.remove { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: var(--t-xs); font-weight: 650; }
+.form { margin-top: 12px; padding: 14px; border-radius: 16px; background: var(--surface); display: flex; flex-direction: column; gap: 10px; }
+.formTitle { margin: 0; font-size: var(--t-sm); }
+.row { display: flex; gap: 8px; }
+.row select, .row input { flex: 1; min-width: 0; height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); padding: 0 10px; font-weight: 600; }
+.row input { max-width: 110px; }
+.primary { height: 44px; border: 0; border-radius: 12px; background: var(--ink); color: var(--bg); font-weight: 700; }
+.primary:disabled { opacity: 0.5; }
+.secondary { align-self: flex-start; height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-weight: 650; font-size: var(--t-sm); }

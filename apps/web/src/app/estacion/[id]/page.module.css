@@ -1,0 +1,6 @@
+.page { min-height: 100dvh; }
+.header { display: flex; justify-content: space-between; align-items: center; height: var(--header-h); padding: 0 16px; width: min(720px, 100%); margin-inline: auto; }
+.main { width: min(720px, 100% - 32px); margin: 0 auto; padding: 24px 0 calc(110px + env(safe-area-inset-bottom)); }
+.back { display: inline-block; margin-bottom: 20px; font-size: var(--t-sm); font-weight: 600; color: var(--brand); text-decoration: none; }
+.back::before { content: '‹ '; }
+.back:hover { text-decoration: underline; }

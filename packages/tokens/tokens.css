@@ -1,0 +1,87 @@
+/* REPOSTA · design tokens v0
+   Concepto: «La coma». Color tomado de la señalización viaria española.
+   Compartidos por web (CSS) y Android (se generan a JS/JSON en la fase 6). */
+
+:root {
+  /* Base */
+  --rp-autovia: #12306b;      /* azul de señal de autovía: marca, texto fuerte en claro */
+  --rp-noche: #0a1630;        /* fondo oscuro: noche azul, no negro */
+  --rp-calzada: #eef1f5;      /* fondo claro frío */
+  --rp-papel: #ffffff;        /* superficies elevadas */
+  --rp-ambar: #f5b21b;        /* ámbar de señal: SOLO la coma y el foco */
+  --rp-gris: #5b6577;         /* texto secundario */
+
+  /* Escala de precio relativo (accesible para daltonismo: luminancia distinta) */
+  --rp-barato: #0f8a6c;
+  --rp-medio: #8a93a3;
+  --rp-caro: #c9472e;
+
+  /* Tinta para texto pequeño sobre fondo (AA ≥ 4,5:1). Los tonos base quedan para rellenos y cifras grandes. */
+  --ok-ink: #075c47;
+  --bad-ink: #9c331b;
+
+  /* Semántica (tema claro) */
+  --bg: var(--rp-calzada);
+  --surface: var(--rp-papel);
+  --ink: #0f1f40;
+  --ink-2: var(--rp-gris);
+  --line: #d6dbe4;
+  --brand: var(--rp-autovia);
+  --signal: var(--rp-ambar);
+  --focus: var(--rp-ambar);
+
+  /* Tipografía: una familia, el eje de anchura como recurso expresivo */
+  --font: 'Archivo', system-ui, sans-serif;
+  --wdth-brand: 125;
+  --wdth-ui: 100;
+  --wdth-tight: 82;
+
+  /* Escala tipográfica (razón 1.25, base 16) */
+  --t-xs: 0.8rem;
+  --t-sm: 0.9rem;
+  --t-md: 1rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.563rem;
+  --t-2xl: 1.953rem;
+  --t-3xl: 2.441rem;
+  --t-price: clamp(4.4rem, 21vw, 17.5rem);
+
+  /* Espacio (base 4) y forma */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-6: 24px; --s-8: 32px; --s-12: 48px; --s-16: 64px; --s-24: 96px;
+  --r-tag: 999px;     /* etiquetas de precio y chips */
+  --r-panel: 20px;    /* hojas y paneles */
+  --r-field: 12px;    /* campos y botones */
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-1: 120ms;
+  --dur-2: 240ms;
+  --dur-3: 480ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: var(--rp-noche);
+    --surface: #10203f;
+    --ink: #e8edf6;
+    --ink-2: #9aa6bc;
+    --line: #1f3156;
+    --brand: #8fb0ff;
+    --rp-barato: #34c29c;
+    --rp-caro: #ff7a5c;
+    --ok-ink: #45d1aa;
+    --bad-ink: #ff8f74;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: var(--rp-noche);
+  --surface: #10203f;
+  --ink: #e8edf6;
+  --ink-2: #9aa6bc;
+  --line: #1f3156;
+  --brand: #8fb0ff;
+  --rp-barato: #34c29c;
+  --rp-caro: #ff7a5c;
+  --ok-ink: #45d1aa;
+  --bad-ink: #ff8f74;
+}

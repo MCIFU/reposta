@@ -1,0 +1,24 @@
+.group { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.opt {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  height: 56px; min-width: 0; padding: 0 4px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface);
+  cursor: pointer; user-select: none; text-align: center; color: var(--ink);
+  transition: background var(--dur-1), border-color var(--dur-1), color var(--dur-1), transform var(--dur-1);
+}
+.opt:hover { border-color: var(--ink-2); }
+.opt:active { transform: scale(0.97); }
+.opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.opt:has(input:focus-visible), .opt:has(select:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.small { font-size: 11px; font-weight: 500; color: var(--ink-2); line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.big { font-size: 1.02rem; font-weight: 750; font-variation-settings: 'wdth' 108; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.opt[data-on] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.opt[data-on] .small { color: color-mix(in srgb, var(--bg) 72%, transparent); }
+/* El selector nativo cubre toda la casilla «Otros»: accesible y con la lista del sistema en móvil. */
+.select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 16px; }
+/* Móviles estrechos (≤ 380 px): texto más compacto para que «Gasóleo A / Diésel» quepa sin cortarse. */
+@media (max-width: 380px) {
+  .group { gap: 4px; }
+  .opt { padding: 0 2px; height: 54px; border-radius: 12px; }
+  .small { font-size: 9.5px; letter-spacing: -0.01em; }
+  .big { font-size: 0.92rem; font-variation-settings: 'wdth' 96; }
+}

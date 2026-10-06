@@ -1,0 +1,24 @@
+{
+  "name": "reposta",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @reposta/web",
+    "build": "npm run build -w @reposta/web",
+    "start": "npm run start -w @reposta/web",
+    "test": "node --test packages/core/test/savings.test.ts packages/core/test/core.test.ts",
+    "typecheck": "npm run typecheck -w @reposta/web",
+    "probe": "node tools/probe-sources.mjs",
+    "icons": "node tools/build-icons.mjs",
+    "vehicles": "node tools/build-vehicles.mjs"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}

@@ -1,0 +1,18 @@
+.dialog { border: 0; padding: 0; border-radius: 22px; background: var(--surface); color: var(--ink); width: min(420px, calc(100% - 32px)); box-shadow: var(--shadow-float); }
+.dialog::backdrop { background: rgb(10 22 48 / 0.45); backdrop-filter: blur(2px); }
+.dialog[open] { animation: up var(--dur-2) var(--ease-out); }
+@keyframes up { from { opacity: 0; transform: translateY(12px); } }
+.form { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.title { margin: 0; font-size: var(--t-xl); font-weight: 750; }
+.help { margin: -6px 0 0; font-size: var(--t-sm); color: var(--ink-2); }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: var(--t-sm); font-weight: 600; }
+.input { display: flex; align-items: center; height: 50px; border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; background: var(--bg); }
+.input:focus-within { border-color: var(--brand); }
+.input input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.input em { font-style: normal; color: var(--ink-2); font-weight: 500; }
+.err { margin: 0; color: var(--bad-ink); font-size: var(--t-sm); }
+.note { margin: 0; font-size: var(--t-xs); color: var(--ink-2); }
+.actions { display: flex; justify-content: flex-end; gap: 8px; }
+.primary, .ghost { height: 46px; padding: 0 20px; border-radius: 12px; font-weight: 700; }
+.primary { border: 0; background: var(--ink); color: var(--bg); }
+.ghost { border: 1px solid var(--line); background: transparent; }

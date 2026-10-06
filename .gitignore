@@ -1,0 +1,12 @@
+node_modules
+.next
+# Datos descargados en tiempo de ejecución (instantáneas MITECO, cachés). El catálogo apps/web/src/data SÍ se versiona.
+/data/
+*.log
+.env
+.env.local
+.env.*.local
+apps/web/public/maplibre/
+apps/web/next-env.d.ts
+apps/web/tsconfig.tsbuildinfo
+.claude/
