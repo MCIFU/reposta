@@ -7,8 +7,8 @@ import path from 'node:path';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { MITECO_BASE, mitecoDay, FUELS, parseMitecoPrice, type MitecoRawResponse } from '@reposta/core';
 import { fetchJson, pool } from './http';
+import { DATA_DIR, safeWrite } from './data-dir';
 
-const DATA_DIR = path.resolve(/*turbopackIgnore: true*/ process.cwd(), process.env.REPOSTA_DATA_DIR ?? '../../data');
 const HIST_DIR = path.join(DATA_DIR, 'hist-municipio');
 
 type DayFile = { date: string; stations: Record<string, Record<string, number>> };
@@ -36,8 +36,7 @@ async function loadDay(municipalityId: string, d: Date): Promise<DayFile | null>
     stations[s['IDEESS']] = prices;
   }
   const out: DayFile = { date: iso, stations };
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, gzipSync(JSON.stringify(out)));
+  await safeWrite(file, gzipSync(JSON.stringify(out)));
   return out;
 }
 

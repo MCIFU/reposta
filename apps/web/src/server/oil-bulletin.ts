@@ -5,6 +5,7 @@ import 'server-only';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { unzipSync, strFromU8 } from 'fflate';
+import { DATA_DIR, safeWrite } from './data-dir';
 
 export const WOB_URL =
   'https://energy.ec.europa.eu/document/download/906e60ca-8b6a-44e7-8589-652854d2fd3f_en?filename=Weekly_Oil_Bulletin_Prices_History_maticni_4web.xlsx';
@@ -23,7 +24,6 @@ export interface WobData {
   series: Record<WobFuel, WobPoint[]>;
 }
 
-const DATA_DIR = path.resolve(/*turbopackIgnore: true*/ process.cwd(), process.env.REPOSTA_DATA_DIR ?? '../../data');
 const CACHE = path.join(DATA_DIR, 'oil-bulletin.json');
 const MAX_AGE = 24 * 3600_000;
 
@@ -94,8 +94,7 @@ async function download(): Promise<WobData> {
   const res = await fetch(WOB_URL, { redirect: 'follow', cache: 'no-store' });
   if (!res.ok) throw new Error(`Boletín UE: HTTP ${res.status}`);
   const data = { fetchedAt: new Date().toISOString(), ...parseBulletin(new Uint8Array(await res.arrayBuffer())) };
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(CACHE, JSON.stringify(data));
+  await safeWrite(CACHE, JSON.stringify(data));
   return data;
 }
 

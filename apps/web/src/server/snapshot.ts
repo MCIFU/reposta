@@ -11,6 +11,7 @@ import {
   type MitecoRawResponse, type Station, type PriceStats,
 } from '@reposta/core';
 import { fetchJson } from './http';
+import { DATA_DIR, safeWrite } from './data-dir';
 
 export interface Snapshot {
   /** Marca de tiempo publicada por MITECO (campo «Fecha»). */
@@ -24,7 +25,6 @@ export interface Snapshot {
   stale: boolean;
 }
 
-const DATA_DIR = path.resolve(/*turbopackIgnore: true*/ process.cwd(), process.env.REPOSTA_DATA_DIR ?? '../../data');
 const SNAP_DIR = path.join(DATA_DIR, 'snapshots');
 const REFRESH_MS = Number(process.env.REPOSTA_REFRESH_MIN ?? 30) * 60_000;
 export const CELL_DEG = 0.1; // ~11 km
@@ -71,9 +71,8 @@ async function fetchFresh(): Promise<Snapshot> {
   if (!raw?.ListaEESSPrecio?.length) throw new Error('MITECO devolvió una lista vacía');
   const snap = build(raw, new Date().toISOString());
   if (snap.sourceTime !== state.snap?.sourceTime) {
-    await fs.mkdir(SNAP_DIR, { recursive: true });
     const name = snap.sourceTime.replace(/[:.]/g, '-') + '.json.gz';
-    await fs.writeFile(path.join(SNAP_DIR, name), gzipSync(JSON.stringify(raw)));
+    await safeWrite(path.join(SNAP_DIR, name), gzipSync(JSON.stringify(raw)));
   }
   state.lastError = undefined;
   return snap;
