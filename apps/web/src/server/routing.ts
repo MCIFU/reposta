@@ -41,7 +41,8 @@ async function ors(points: LatLng[]): Promise<RouteCore> {
     const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
       method: 'POST', signal: ctrl.signal, cache: 'no-store',
       headers: { Authorization: ORS_KEY!, 'Content-Type': 'application/json', Accept: 'application/geo+json, application/json' },
-      body: JSON.stringify({ coordinates: points.map((p) => [p.lng, p.lat]), instructions: false }),
+      // instructions:true es necesario: sin él, ORS no devuelve «segments» (los tramos entre paradas).
+      body: JSON.stringify({ coordinates: points.map((p) => [p.lng, p.lat]), instructions: true, instructions_format: 'text', language: 'es' }),
     });
     const d = await res.json();
     if (res.status === 429) throw new Error('Se ha alcanzado el límite de rutas por ahora. Inténtalo en un minuto.');
@@ -57,7 +58,9 @@ async function ors(points: LatLng[]): Promise<RouteCore> {
     return {
       distanceKm: (f.properties?.summary?.distance ?? 0) / 1000,
       durationMin: (f.properties?.summary?.duration ?? 0) / 60,
-      legs: segs.map((sg) => ({ distanceKm: (sg.distance ?? 0) / 1000, durationMin: (sg.duration ?? 0) / 60 })),
+      legs: segs.length
+        ? segs.map((sg) => ({ distanceKm: (sg.distance ?? 0) / 1000, durationMin: (sg.duration ?? 0) / 60 }))
+        : [{ distanceKm: (f.properties?.summary?.distance ?? 0) / 1000, durationMin: (f.properties?.summary?.duration ?? 0) / 60 }],
       geometry: f.geometry.coordinates,
     };
   } finally {
