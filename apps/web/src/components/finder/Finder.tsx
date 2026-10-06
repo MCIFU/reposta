@@ -141,6 +141,12 @@ export function Finder({ summary }: { summary: Summary | null }) {
           {error && status !== 'error' && <p className={styles.inlineError} role="alert">{error}</p>}
         </div>
 
+        {showResults && result.total > 0 && (
+          <div className={styles.bestArea}>
+            <Best r={result} prefs={prefs} onOpen={open} onEditPrefs={() => setPrefsOpen(true)} />
+          </div>
+        )}
+
         <section className={styles.mapArea} aria-label="Mapa de precios" onPointerDown={() => setMapWanted(true)}>
           {mapWanted ? <MapView
             fuel={fuel}
@@ -183,7 +189,6 @@ export function Finder({ summary }: { summary: Summary | null }) {
           )}
           {showResults && result.total > 0 && (
             <>
-              <Best r={result} prefs={prefs} onOpen={open} onEditPrefs={() => setPrefsOpen(true)} />
               <Controls r={result} sort={sort} onSort={setSort} radius={radius} onRadius={setRadius} openOnly={openOnly} onOpenOnly={setOpenOnly} />
               <StationList r={result} prefs={prefs} selectedId={selected} onOpen={open} />
               <footer className={styles.listFoot}>

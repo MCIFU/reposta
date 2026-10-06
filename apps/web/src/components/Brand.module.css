@@ -8,7 +8,8 @@
   display: inline-flex; align-items: flex-end; font-weight: 800; font-variation-settings: 'wdth' 125;
   letter-spacing: -0.045em; line-height: 0.82; color: var(--ink);
 }
-.hero { font-size: clamp(4.2rem, 21vw, 6.6rem); }
+.hero { font-size: clamp(3rem, 14vw, 4rem); }
+@media (min-width: 960px) { .hero { font-size: 6.6rem; } }
 .lg { font-size: clamp(2.6rem, 11vw, 3.4rem); }
 .priceComma { fill: var(--signal); width: 0.3em; height: 0.56em; margin: 0 0.01em -0.18em; flex: none; }
 .unit { font-size: 0.2em; font-weight: 600; letter-spacing: 0; font-variation-settings: 'wdth' 100; color: var(--ink-2); margin-left: 0.4em; padding-bottom: 0.28em; }

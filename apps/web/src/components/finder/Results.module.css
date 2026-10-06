@@ -2,7 +2,8 @@
 .updated[data-stale] { color: var(--bad-ink); }
 
 /* La más barata */
-.best { padding-block: var(--s-6) var(--s-4); }
+.best { padding-block: 14px 14px; }
+
 .bestBtn { all: unset; display: block; cursor: pointer; border-radius: 12px; }
 .bestBtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
 .bestBtn:hover .bestWhere strong { text-decoration: underline; text-underline-offset: 3px; }
@@ -62,3 +63,14 @@
 .go svg { width: 22px; height: 22px; }
 
 .skel { padding-block: var(--s-6); }
+
+/* Móvil: «la más barata» compacta (precio a la izquierda, gasolinera a la derecha) para dejar sitio al mapa. */
+@media (max-width: 959px) {
+  .bestBtn { display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 0 14px; }
+  .bestWhere { margin-top: 0; font-size: var(--t-md); line-height: 1.25; padding-bottom: 2px; min-width: 0; }
+  .bestWhere strong { display: block; font-size: 1.1rem; }
+  .approx { display: block; font-size: var(--t-sm); }
+  .bestAddr { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .answer { margin-top: 12px; padding: 10px 12px; }
+}
+@media (min-width: 960px) { .best { padding-block: var(--s-6) var(--s-4); } }

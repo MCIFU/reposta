@@ -6,10 +6,10 @@
   /* Base */
   --rp-autovia: #12306b;      /* azul de señal de autovía: marca, texto fuerte en claro */
   --rp-noche: #0a1630;        /* fondo oscuro: noche azul, no negro */
-  --rp-calzada: #eef1f5;      /* fondo claro frío */
+  --rp-calzada: #f3f5f8;      /* fondo claro frío */
   --rp-papel: #ffffff;        /* superficies elevadas */
   --rp-ambar: #f5b21b;        /* ámbar de señal: SOLO la coma y el foco */
-  --rp-gris: #5b6577;         /* texto secundario */
+  --rp-gris: #4f5a6d;         /* texto secundario (contraste AA holgado: ~6,5:1 sobre el fondo claro) */
 
   /* Escala de precio relativo (accesible para daltonismo: luminancia distinta) */
   --rp-barato: #0f8a6c;
@@ -25,7 +25,7 @@
   --surface: var(--rp-papel);
   --ink: #0f1f40;
   --ink-2: var(--rp-gris);
-  --line: #d6dbe4;
+  --line: #d2d8e2;
   --brand: var(--rp-autovia);
   --signal: var(--rp-ambar);
   --focus: var(--rp-ambar);

@@ -5,9 +5,10 @@ export type MapTheme = 'light' | 'dark';
 
 const PALETTE = {
   light: {
-    bg: '#eef1f5', water: '#cdd9ea', park: '#e2e9e3', residential: '#e8ecf1', building: '#dfe4ec',
-    minor: '#ffffff', major: '#ffffff', motorway: '#d6dff0', casing: '#d4dae4', rail: '#cfd5df',
-    boundary: '#9aa6bc', label: '#5b6577', labelStrong: '#24324f', halo: '#eef1f5',
+    // Más contraste en móvil: agua azul nítida, tierra clara, carreteras blancas con borde y etiquetas oscuras.
+    bg: '#f2f4f7', water: '#b3c8e4', park: '#dce8dc', residential: '#e8ebf0', building: '#dde2ea',
+    minor: '#ffffff', major: '#ffffff', motorway: '#c5d3ef', casing: '#c3ccd9', rail: '#c3cad6',
+    boundary: '#8693ab', label: '#4a5568', labelStrong: '#16233f', halo: '#f2f4f7',
   },
   dark: {
     bg: '#0a1630', water: '#060f24', park: '#0c1c35', residential: '#0c1a35', building: '#122447',
