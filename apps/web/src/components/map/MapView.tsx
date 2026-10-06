@@ -53,6 +53,9 @@ export default function MapView({ fuel, origin, radiusKm, selectedId, bestId = n
   const el = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const pointsRef = useRef<Point[]>([]);
+  const fuelRef = useRef(fuel);
+  fuelRef.current = fuel;
+  const loadedUrl = useRef<string | null>(null);
   const themeRef = useRef<MapTheme>('light');
   const cuts = useRef<[number, number]>([0, 0]);
   const clusterCuts = useRef<[number, number]>([0, 0]);
@@ -87,6 +90,7 @@ export default function MapView({ fuel, origin, radiusKm, selectedId, bestId = n
 
   function addOverlay(map: MlMap) {
     if (map.getSource('stations')) return;
+    loadedUrl.current = null;
     map.addSource('stations', {
       type: 'geojson', data: { type: 'FeatureCollection', features: [] },
       cluster: true, clusterMaxZoom: 11, clusterRadius: 48,
@@ -134,10 +138,10 @@ export default function MapView({ fuel, origin, radiusKm, selectedId, bestId = n
   function pushData(map: MlMap) {
     const src = map.getSource('stations') as GeoJSONSource | undefined;
     if (!src) return;
-    src.setData({
-      type: 'FeatureCollection',
-      features: pointsRef.current.map(([id, lat, lng, p]) => ({ type: 'Feature', properties: { id, p }, geometry: { type: 'Point', coordinates: [lng, lat] } })),
-    });
+    // Las 11.000 estaciones las descarga el worker del mapa por URL (una vez por combustible); aquí solo
+    // se actualizan origen, radio y marcadas, que son baratos.
+    const url = `/api/map/points?fuel=${fuelRef.current}&format=geojson`;
+    if (loadedUrl.current !== url) { src.setData(url); loadedUrl.current = url; }
     const { origin: o, radiusKm: r } = props.current;
     (map.getSource('origin') as GeoJSONSource).setData({ type: 'FeatureCollection', features: o ? [{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [o.lng, o.lat] } }] : [] });
     (map.getSource('radius') as GeoJSONSource).setData({ type: 'FeatureCollection', features: o ? [circle(o, r)] : [] });

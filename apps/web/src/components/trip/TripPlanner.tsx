@@ -40,6 +40,13 @@ export function TripPlanner() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [err, setErr] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  // Igual que en Precios: el mapa se monta tras la carga, para que el formulario responda al instante.
+  const [mapWanted, setMapWanted] = useState(false);
+  useEffect(() => {
+    const ric = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 600));
+    const go = () => ric(() => setMapWanted(true), { timeout: 3000 });
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
+  }, []);
   const seq = useRef(0);
   const nextKey = useRef(3);
 
@@ -275,12 +282,12 @@ export function TripPlanner() {
             <span className="num">{integer(Math.round(calc.dist))} km · {minutes(Math.round(calc.time))} · {dec(calc.liters)} {fuel.unit}</span>
           </div>
         )}
-        <RouteMap
+        {mapWanted ? <RouteMap
           points={filled}
           geometry={plan?.geometry ?? null}
           stations={plan?.stations.cheapest.slice(0, 5) ?? []}
           onStation={(id) => window.open(`/estacion/${id}?fuel=${fuelSel}`, '_self')}
-        />
+        /> : <div className={`${styles.mapLoading} skeleton`} aria-hidden="true" />}
       </div>
     </main>
   );

@@ -1,5 +1,7 @@
 # 02 · Arquitectura y stack
 
+> **Nota (octubre de 2026):** este es el plan inicial de la fase 0. Se decidió mantener REPOSTA sin base de datos ni cuentas y publicar Android como PWA con PWABuilder; el estado real está en el [README](../README.md) y en [06-fase-1-mvp.md](06-fase-1-mvp.md).
+
 ## Requisitos que condicionan la arquitectura
 
 1. **Las apps nunca hablan con el Ministerio.** 12 MB sin comprimir cada 30 min es inviable en móvil. Nuestro backend ingiere, normaliza y sirve respuestas pequeñas («las 20 más baratas en 10 km»: unos 5 KB).
@@ -112,7 +114,7 @@ reposta/
 ├─ services/
 │  └─ ingest/         ingestor MITECO / CartoCiudad / WOB + backfill
 ├─ db/
-│  ├─ schema.sql      esquema (ver 03)
+│  ├─ schema.sql      esquema (no implementado)
 │  └─ migrations/
 ├─ brand/             identidad visual
 ├─ docs/              esta documentación

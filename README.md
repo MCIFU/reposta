@@ -2,42 +2,57 @@
 
 **Tu combustible. Tu precio. Tus datos.**
 
-Plataforma para consultar, comparar y entender los precios del combustible en España. Responde a cuánto cuesta, dónde cuesta menos, cuánto ha costado, cómo evoluciona y cuánto puedes ahorrar tú.
+Web y app (PWA) con los precios oficiales de las gasolineras de España.
 
-## Estado
+- **Precios:** mapa y lista de las gasolineras más baratas cerca de ti, actualizados cada 30 minutos con datos del Ministerio (MITECO), con la respuesta a «¿de verdad me compensa ir hasta allí?».
+- **Histórico:** evolución semanal del precio medio oficial en España desde 2005 (Comisión Europea), con y sin impuestos.
+- **Viaje:** coste, litros, kilómetros y tiempo de un viaje con paradas, según el consumo oficial WLTP de tu coche (catálogo de la Agencia Europea de Medio Ambiente), y las gasolineras más baratas de la ruta.
+- **Alertas:** aviso cuando cambia el precio de una gasolinera o de la más barata de tu zona.
+- **Datos:** fuentes, licencias y cómo se calcula cada cifra.
 
-- **Fase 0, investigación y arquitectura:** completada.
-- **Fase 1, MVP «Encuentra dónde repostar»:** completada. Ver [docs/06-fase-1-mvp.md](docs/06-fase-1-mvp.md).
+No hay cuentas ni cookies: las preferencias y alertas se guardan en el dispositivo.
 
-## Documentación
+## Estructura
 
-| Documento | Contenido |
-|---|---|
-| [docs/01-fuentes-de-datos.md](docs/01-fuentes-de-datos.md) | Fuentes oficiales verificadas (MITECO, CartoCiudad, Weekly Oil Bulletin), campos, frecuencia, limitaciones y licencias |
-| [docs/02-arquitectura-y-stack.md](docs/02-arquitectura-y-stack.md) | Arquitectura, stack razonado, mapas, auth, despliegue, costes y Android |
-| [docs/03-modelo-de-datos.md](docs/03-modelo-de-datos.md) | Entidades, estrategia para unos 260 M de puntos históricos, pipeline de ingesta y calidad del dato |
-| [docs/04-calculos.md](docs/04-calculos.md) | Estadísticas, récords, «¿Me compensa?» y estadísticas personales |
-| [docs/05-plan-maestro.md](docs/05-plan-maestro.md) | Fases 1–6, cambios propuestos al briefing, oportunidades y riesgos |
-| [db/schema.sql](db/schema.sql) | Esquema PostgreSQL + PostGIS (validado) |
-| [packages/core](packages/core) | Lógica compartida web/Android: cálculo de ahorro real y formatos (con tests) |
-| [packages/tokens/tokens.css](packages/tokens/tokens.css) | Design tokens |
-| [brand/index.html](brand/index.html) | Identidad visual «La coma» |
-| [docs/06-fase-1-mvp.md](docs/06-fase-1-mvp.md) | Qué se construyó en la fase 1, resultados de la autocomprobación y limitaciones |
-| [apps/web](apps/web) | Aplicación web (Next.js): buscador, mapa, ficha y API |
+```
+apps/web          Aplicación Next.js (páginas, API y PWA)
+packages/core     Lógica compartida y probada: combustibles, horarios, normalización MITECO, ahorro real
+packages/tokens   Colores, tipografía y espaciado
+brand/            Identidad visual, iconos e imagen destacada para Google Play
+tools/            Verificación de fuentes, catálogo de coches, iconos y capturas
+docs/             Fuentes de datos, arquitectura y cálculos
+```
 
-## Comandos
+## Desarrollo
+
+Requiere Node 22.12 o superior.
 
 ```bash
 npm install
-npm run dev                    # aplicación en http://localhost:3000
-npm test                       # tests de dominio (Node ≥ 22.6)
-npm run build                  # build de producción
-npm run probe                  # verifica las fuentes oficiales en vivo
-node tools/cdp-shot.mjs <url> <png> [ancho] [alto] [light|dark]   # capturas para revisión visual
+```
+```bash
+npm run dev
 ```
 
-## Reglas del proyecto
+Abre http://localhost:3000. Las variables de entorno están documentadas en `apps/web/.env.example`.
 
-- Ningún dato inventado. Cada cifra muestra su fuente y su hora.
-- Precio actual, precio histórico, media calculada por REPOSTA y media oficial externa se presentan siempre por separado.
-- Si alguna vez se necesitan datos simulados, se marcan como **DATOS DE DEMOSTRACIÓN**.
+```bash
+npm test
+```
+```bash
+npm run build
+```
+
+Otras tareas: `npm run probe` (comprueba las fuentes oficiales), `npm run vehicles` (regenera el catálogo de coches) y `npm run icons` (regenera los iconos).
+
+## Publicar
+
+Los pasos para Railway, el dominio, PWABuilder y Google Play están en [DEPLOY.md](DEPLOY.md).
+
+## Fuentes y licencias de los datos
+
+- Precios y gasolineras: Ministerio para la Transición Ecológica y el Reto Demográfico (MITECO).
+- Histórico nacional: Comisión Europea, Weekly Oil Bulletin (CC BY 4.0).
+- Consumo de los coches: Agencia Europea de Medio Ambiente (CC BY 4.0).
+- Direcciones: CartoCiudad, © Instituto Geográfico Nacional (CC BY 4.0).
+- Mapa y rutas: © colaboradores de OpenStreetMap (ODbL), vía OpenFreeMap y OpenRouteService/OSRM.

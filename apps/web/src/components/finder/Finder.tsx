@@ -32,12 +32,16 @@ export function Finder({ summary }: { summary: Summary | null }) {
   const [result, setResult] = useState<NearbyResult | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [prefsOpen, setPrefsOpen] = useState(false);
-  // El mapa (MapLibre + 11.000 puntos) es lo más pesado: se monta cuando el navegador queda libre tras pintar la lista.
+  // El mapa (MapLibre + 11.000 puntos) es lo más pesado. Primero se pintan fecha, precios y lista; el mapa se monta
+  // cuando la página ha terminado de cargar y el navegador queda libre (o antes, si el usuario toca la zona del mapa).
   const [mapWanted, setMapWanted] = useState(false);
   useEffect(() => {
-    const ric = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1200));
-    const id = ric(() => setMapWanted(true), { timeout: 2000 });
-    return () => (window.cancelIdleCallback ?? clearTimeout)(id as number);
+    let id: number | undefined;
+    const ric = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 600));
+    const schedule = () => { id = ric(() => setMapWanted(true), { timeout: 3000 }) as number; };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+    return () => { window.removeEventListener('load', schedule); if (id) (window.cancelIdleCallback ?? clearTimeout)(id); };
   }, []);
   const [prefs, setPrefs] = useStored<TripPrefs>('rp-trip', DEFAULT_TRIP);
   const [savedPlace, setSavedPlace, placeReady] = useStored<PickedPlace | null>('rp-place', null);
@@ -137,7 +141,7 @@ export function Finder({ summary }: { summary: Summary | null }) {
           {error && status !== 'error' && <p className={styles.inlineError} role="alert">{error}</p>}
         </div>
 
-        <section className={styles.mapArea} aria-label="Mapa de precios">
+        <section className={styles.mapArea} aria-label="Mapa de precios" onPointerDown={() => setMapWanted(true)}>
           {mapWanted ? <MapView
             fuel={fuel}
             origin={place}
@@ -147,7 +151,7 @@ export function Finder({ summary }: { summary: Summary | null }) {
             onSelect={open}
             onSearchHere={(c) => pick({ ...c, label: 'Zona del mapa', source: 'map' })}
             fitKey={`${place?.lat},${place?.lng},${radius}`}
-          /> : <div className={styles.mapLoading}>Cargando mapa…</div>}
+          /> : <div className={`${styles.mapLoading} skeleton`} aria-hidden="true" />}
         </section>
 
         <section ref={listTop} className={styles.results} aria-label="Resultados">

@@ -3,7 +3,7 @@
 .side { display: contents; }
 .panel { grid-area: panel; padding: 16px; display: flex; flex-direction: column; }
 .mapArea { position: relative; grid-area: map; height: 44vh; min-height: 300px; border-block: 1px solid var(--line); }
-.mapLoading { height: 100%; display: grid; place-items: center; color: var(--ink-2); background: var(--surface-2); }
+.mapLoading { height: 100%; border-radius: 0 !important; display: grid; place-items: center; color: var(--ink-2); background: var(--surface-2); }
 .results { grid-area: results; padding: 20px 16px calc(100px + env(safe-area-inset-bottom)); }
 
 .block { padding-block: 14px; border-bottom: 1px solid var(--line); }

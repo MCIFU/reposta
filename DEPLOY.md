@@ -44,7 +44,7 @@ Coste orientativo: unos 5 $/mes (plan Hobby).
 5. En **Google Play Console** (cuenta de desarrollador, 25 $ en un único pago):
    - Crea la app y sube el `.aab`.
    - Política de privacidad: `https://tu-dominio.es/privacidad`.
-   - Ficha: icono de 512 px (`apps/web/public/icons/icon-512.png`), capturas de móvil (`apps/web/public/screenshots/*-movil.png`) y una imagen destacada de 1024×500 (no incluida).
+   - Ficha: icono de 512 px (`apps/web/public/icons/icon-512.png`), capturas de móvil (`apps/web/public/screenshots/*-movil.png`) e imagen destacada de 1024×500 (`brand/feature-graphic-1024x500.png`).
    - Formulario de seguridad de los datos: ubicación aproximada y precisa, opcional y no compartida; no se recogen otros datos.
    - Las cuentas personales nuevas deben hacer una **prueba cerrada con al menos 12 testers durante 14 días** antes de publicar en producción.
 

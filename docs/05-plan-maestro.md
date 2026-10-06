@@ -1,5 +1,7 @@
 # 05 · Plan maestro de REPOSTA
 
+> **Nota (octubre de 2026):** este es el plan inicial de la fase 0. Se decidió mantener REPOSTA sin base de datos ni cuentas y publicar Android como PWA con PWABuilder; el estado real está en el [README](../README.md) y en [06-fase-1-mvp.md](06-fase-1-mvp.md).
+
 > «Cuánto cuesta, dónde cuesta menos, cuánto ha costado, cómo evoluciona y cuánto puedes ahorrar tú.»
 
 ## Conclusiones de la fase 0
