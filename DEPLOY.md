@@ -31,6 +31,18 @@ git push -u origin main
 
 Coste orientativo: unos 5 $/mes (plan Hobby).
 
+## 2 (alternativa). Desplegar en Vercel
+
+1. En https://vercel.com/new elige **Import Git Repository → MCIFU/reposta**. Si no aparece, pulsa *Adjust GitHub App Permissions* y da acceso a ese repositorio (es privado).
+2. **Root Directory:** `apps/web`. El framework (Next.js) se detecta solo; deja los comandos por defecto.
+3. **Environment Variables:** las mismas de la tabla de Railway, salvo `REPOSTA_DATA_DIR` (en Vercel las cachés van a `/tmp` automáticamente).
+4. **Deploy.** Al terminar, abre `https://<tu-proyecto>.vercel.app/api/health`: debe mostrar `"stale": false` y unas 11.500 estaciones.
+5. Dominio propio: *Settings → Domains*.
+
+Diferencias con Railway:
+- Cada instancia que arranca en frío descarga los precios del Ministerio (unos 4 s la primera visita tras un rato sin uso).
+- El plan gratuito (Hobby) es solo para uso no comercial. Si pones publicidad o cobras, necesitas el plan Pro.
+
 ## 3. App Android con PWABuilder
 
 1. Con la web ya publicada en tu dominio, ve a https://www.pwabuilder.com e introduce la URL.
