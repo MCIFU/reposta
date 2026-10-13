@@ -6,6 +6,7 @@ import { getBulletin, WOB_PAGE } from '@/server/oil-bulletin';
 import vehicles from '@/data/vehicles.json';
 import { FUELS } from '@reposta/core';
 import { clock, dayMonth, integer, price } from '@/lib/format';
+import { ClearMyData } from '@/components/ClearMyData';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -134,6 +135,10 @@ export default async function DataPage() {
               <p>El gráfico de cada gasolinera usa el precio oficial de MITECO vigente a las 00:00 de cada día. La pestaña Histórico usa la media semanal oficial de la Comisión Europea, que es una serie distinta.</p>
             </article>
           </div>
+        </section>
+
+        <section className={styles.section} aria-label="Tus datos">
+          <ClearMyData />
         </section>
 
         <p className={styles.back}><Link href="/">Ver los precios de hoy</Link> · <Link href="/privacidad">Política de privacidad</Link></p>

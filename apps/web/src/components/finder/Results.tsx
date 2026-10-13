@@ -83,6 +83,9 @@ export function Best({ r, prefs, onOpen, onEditPrefs }: { r: NearbyResult; prefs
         <button type="button" className={styles.prefs} onClick={onEditPrefs}>
           Calculado para {prefs.liters} {unit === 'L' ? 'L' : unit} y {String(prefs.consumption).replace('.', ',')} L/100 km. Cambiar
         </button>
+        <button type="button" className={styles.prefs} onClick={() => window.dispatchEvent(new Event('rp-open-alerts'))}>
+          Avisarme si cambia el precio aquí
+        </button>
       </div>
     </section>
   );

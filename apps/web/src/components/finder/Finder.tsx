@@ -21,7 +21,15 @@ interface Summary { meta: { sourceTime: string; stale: boolean }; stations: numb
 type Status = 'idle' | 'locating' | 'loading' | 'ready' | 'error';
 const RADII = [3, 5, 10, 20, 30, 50];
 
-export function Finder({ summary }: { summary: Summary | null }) {
+export function Finder({ summary: initialSummary }: { summary: Summary | null }) {
+  // Resumen nacional (fecha del dato y medias de hoy): llega del servidor si lo hay o se pide al montar.
+  const [summary, setSummary] = useState<Summary | null>(initialSummary);
+  useEffect(() => {
+    if (initialSummary) return;
+    let alive = true;
+    fetch('/api/summary').then((r) => (r.ok ? r.json() : null)).then((d) => alive && d && setSummary(d)).catch(() => {});
+    return () => { alive = false; };
+  }, [initialSummary]);
   const [fuel, setFuel] = useState(DEFAULT_FUEL);
   const [place, setPlace] = useState<PickedPlace | null>(null);
   const [sort, setSort] = useState<Sort>('price');
@@ -135,7 +143,12 @@ export function Finder({ summary }: { summary: Summary | null }) {
       <main className={styles.layout}>
         <div className={styles.search}>
           <h1 className="sr-only">Precios del combustible hoy y gasolineras más baratas</h1>
-          {meta && <DayBar iso={meta.sourceTime} stale={meta.stale} />}
+          {meta ? <DayBar iso={meta.sourceTime} stale={meta.stale} /> : (
+            <div className={styles.dayBar} aria-busy="true" aria-label="Cargando la fecha de los precios">
+              <div className="skeleton" style={{ height: 22, width: '72%' }} />
+              <div className="skeleton" style={{ height: 14, width: '58%', marginTop: 6 }} />
+            </div>
+          )}
           <FuelPicker value={fuel} onChange={changeFuel} />
           <PlaceSearch current={place} onPick={pick} onLocate={locate} locating={status === 'locating'} />
           {error && status !== 'error' && <p className={styles.inlineError} role="alert">{error}</p>}
@@ -232,6 +245,12 @@ function Intro({ summary, fuel, onLocate }: { summary: Summary | null; fuel: str
       <h2 id="intro-title" className={styles.introTitle}>¿Dónde quieres repostar?</h2>
       <p className={styles.introText}>Usa tu ubicación, busca una ciudad o un código postal, o muévete por el mapa. Te enseñamos las gasolineras más baratas y si de verdad compensa ir hasta ellas.</p>
       <button type="button" className={styles.cta} onClick={onLocate}>Usar mi ubicación</button>
+      {!summary && (
+        <div className={styles.today} aria-busy="true" aria-label="Cargando los precios de hoy">
+          <div className="skeleton" style={{ height: 18, width: '45%' }} />
+          <div className="skeleton" style={{ height: 40, marginTop: 16 }} />
+        </div>
+      )}
       {st && summary && (
         <div className={styles.today}>
           <p className={styles.todayTitle}>{f.name} hoy en España</p>

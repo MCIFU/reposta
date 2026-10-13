@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AppNav } from '@/components/AppNav';
+import { ClearMyData } from '@/components/ClearMyData';
 import styles from '../datos/page.module.css';
 
 export const metadata: Metadata = {
@@ -33,7 +34,11 @@ export default function PrivacyPage() {
 
         <section className={styles.section}>
           <h2>Lo que se guarda en tu dispositivo</h2>
-          <p>Para que no tengas que repetir nada, REPOSTA guarda en el almacenamiento local de tu navegador: el combustible elegido, el último lugar buscado, los litros y el consumo para «¿Me compensa?», tu coche y la capacidad del depósito, el modo claro u oscuro y tus alertas de precio con sus avisos. Nada de esto sale de tu dispositivo salvo lo necesario para comprobar las alertas (el identificador de la gasolinera o el punto y el radio de la zona). Puedes borrarlo todo eliminando los datos del sitio en tu navegador o desinstalando la app.</p>
+          <p>Para que no tengas que repetir nada, REPOSTA guarda en el almacenamiento local de tu navegador: el combustible elegido, el último lugar buscado, los litros y el consumo para «¿Me compensa?», tu coche y la capacidad del depósito, el modo claro u oscuro y tus alertas de precio con sus avisos. Nada de esto sale de tu dispositivo salvo lo necesario para comprobar las alertas (el identificador de la gasolinera o el punto y el radio de la zona). Puedes borrarlo todo con el botón «Borrar mis datos» de esta página o de la pestaña Datos, o eliminando los datos del sitio en tu navegador.</p>
+        </section>
+
+        <section className={styles.section} aria-label="Borrar tus datos">
+          <ClearMyData />
         </section>
 
         <section className={styles.section}>

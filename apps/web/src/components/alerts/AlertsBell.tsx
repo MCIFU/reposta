@@ -12,7 +12,9 @@ const CHECK_MS = 15 * 60_000;
 export function AlertsBell() {
   const s = useAlerts();
   const [open, setOpen] = useState(false);
-  const [toast, setToast] = useState<AlertEvent | null>(null);
+  // Avisos nuevos detectados al entrar (o en las comprobaciones periódicas). Se quedan hasta que los cierras.
+  const [toast, setToast] = useState<AlertEvent[]>([]);
+  const [openCount, setOpenCount] = useState(0);
   const dlg = useRef<HTMLDialogElement>(null);
   const unread = s.events.filter((e) => !e.read).length;
 
@@ -24,7 +26,7 @@ export function AlertsBell() {
       last = Date.now();
       const fresh = await checkAlerts().catch(() => []);
       if (!fresh.length) return;
-      setToast(fresh[0]);
+      setToast(fresh);
       if (document.visibilityState === 'hidden' && 'Notification' in window && Notification.permission === 'granted') {
         for (const e of fresh.slice(0, 3)) new Notification(`REPOSTA: ${e.title}`, { body: e.body, icon: '/icon.svg', tag: e.id });
       }
@@ -36,7 +38,13 @@ export function AlertsBell() {
     return () => { clearInterval(t); document.removeEventListener('visibilitychange', vis); };
   }, [s.alerts.length]);
 
-  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 9000); return () => clearTimeout(t); }, [toast]);
+  // Otras pantallas pueden abrir el panel (p. ej. «Avisarme si baja aquí» en Precios).
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener('rp-open-alerts', onOpen);
+    return () => window.removeEventListener('rp-open-alerts', onOpen);
+  }, []);
+  useEffect(() => { if (open) { setToast([]); setOpenCount((n) => n + 1); } }, [open]);
 
   useEffect(() => {
     const d = dlg.current; if (!d) return;
@@ -51,10 +59,19 @@ export function AlertsBell() {
         {unread > 0 && <span className={styles.badge} aria-hidden="true">{unread > 9 ? '9+' : unread}</span>}
       </button>
 
-      {toast && (
-        <div className={styles.toast} role="status" data-dir={toast.dir}>
-          <Link href={toast.href} onClick={() => setToast(null)}><strong>{toast.title}</strong><span>{toast.body}</span></Link>
-          <button type="button" onClick={() => setToast(null)} aria-label="Cerrar aviso">×</button>
+      {toast.length === 1 && (
+        <div className={styles.toast} role="status" data-dir={toast[0].dir}>
+          <Link href={toast[0].href} onClick={() => setToast([])}><strong>{toast[0].title}</strong><span>{toast[0].body}</span></Link>
+          <button type="button" onClick={() => setToast([])} aria-label="Cerrar aviso">×</button>
+        </div>
+      )}
+      {toast.length > 1 && (
+        <div className={styles.toast} role="status" data-dir={toast.some((e) => e.dir !== 'up') ? 'down' : 'up'}>
+          <button type="button" className={styles.toastMain} onClick={() => setOpen(true)}>
+            <strong>{toast.length} cambios de precio en tus alertas</strong>
+            <span>{toast[0].title}. Toca para verlos todos.</span>
+          </button>
+          <button type="button" onClick={() => setToast([])} aria-label="Cerrar aviso">×</button>
         </div>
       )}
 
@@ -104,7 +121,7 @@ export function AlertsBell() {
                 </li>
               ))}
             </ul>
-            <AreaForm />
+            <AreaForm key={openCount} />
           </section>
         </div>
       </dialog>

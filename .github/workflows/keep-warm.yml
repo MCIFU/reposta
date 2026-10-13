@@ -1,0 +1,19 @@
+# Mantiene caliente la copia compartida de precios en Vercel (/api/snapshot), para que la primera
+# visita no tenga que esperar a la descarga de los 12 MB del Ministerio. Gratis en repos públicos.
+# Nota: GitHub pausa las tareas programadas tras 60 días sin actividad en el repositorio.
+name: Mantener precios en caché
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      SITE: ${{ vars.SITE_URL || 'https://reposta-two.vercel.app' }}
+    steps:
+      - name: Refrescar copia compartida y comprobar salud
+        run: |
+          curl -fsS --max-time 90 -o /dev/null -w "snapshot %{http_code} en %{time_total}s\n" "$SITE/api/snapshot"
+          curl -fsS --max-time 60 "$SITE/api/health"
