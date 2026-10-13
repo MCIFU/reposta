@@ -1,6 +1,6 @@
 // Rutas por carretera (datos de OpenStreetMap).
 // - Producción: OpenRouteService si hay ORS_API_KEY (plan gratuito: 2.000 rutas/día, 40/min).
-// - Desarrollo: OSRM (REPOSTA_ROUTING_URL; por defecto el servidor público de demostración, no apto para uso intensivo).
+// - Reserva (y desarrollo): OSRM (REPOSTA_ROUTING_URL; por defecto el servidor público de demostración, no apto para uso intensivo).
 import 'server-only';
 import { haversineKm, isOpenAt, type LatLng, priceStats } from '@reposta/core';
 import { getSnapshot, CELL_DEG } from './snapshot';
@@ -8,10 +8,11 @@ import { fetchJson } from './http';
 
 const OSRM = process.env.REPOSTA_ROUTING_URL ?? 'https://router.project-osrm.org';
 const ORS_KEY = process.env.ORS_API_KEY;
-export const ROUTING_PROVIDER = ORS_KEY ? 'OpenRouteService · © OpenStreetMap' : 'OSRM · © OpenStreetMap';
 const cache = new Map<string, Promise<RouteCore>>();
 
 interface RouteCore {
+  /** Proveedor que ha calculado la ruta (para la atribución). */
+  provider: string;
   distanceKm: number;
   durationMin: number;
   legs: Array<{ distanceKm: number; durationMin: number }>;
@@ -34,9 +35,14 @@ export interface RouteStation {
   openNow: boolean | null;
 }
 
+/** Error que el usuario debe ver tal cual (p. ej. «no hay ruta»); no se reintenta con otro proveedor. */
+class RouteUserError extends Error {}
+
+const ORS_TIMEOUT_MS = 9_000;
+
 async function ors(points: LatLng[]): Promise<RouteCore> {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20_000);
+  const timer = setTimeout(() => ctrl.abort(), ORS_TIMEOUT_MS);
   try {
     const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
       method: 'POST', signal: ctrl.signal, cache: 'no-store',
@@ -44,23 +50,22 @@ async function ors(points: LatLng[]): Promise<RouteCore> {
       // instructions:true es necesario: sin él, ORS no devuelve «segments» (los tramos entre paradas).
       body: JSON.stringify({ coordinates: points.map((p) => [p.lng, p.lat]), instructions: true, instructions_format: 'text', language: 'es' }),
     });
-    const d = await res.json();
-    if (res.status === 429) throw new Error('Se ha alcanzado el límite de rutas por ahora. Inténtalo en un minuto.');
-    if (res.status === 401 || res.status === 403) {
-      console.error('[rutas] OpenRouteService rechaza la clave ORS_API_KEY:', d?.error);
-      throw new Error('El servicio de rutas no está disponible ahora mismo.');
+    const d = await res.json().catch(() => null); // un 502 de nginx llega como HTML
+    if (res.status === 404 || (d && /route|routable/i.test(JSON.stringify(d.error ?? '')) && res.status < 500)) {
+      throw new RouteUserError('No hay ruta por carretera entre esos puntos.');
     }
-    // ORS devuelve error como texto o como { code, message } según el caso.
-    if (!res.ok) throw new Error(res.status === 404 || /route/i.test(JSON.stringify(d?.error ?? '')) ? 'No hay ruta por carretera entre esos puntos.' : 'No se pudo calcular la ruta.');
-    const f = d.features?.[0];
-    if (!f) throw new Error('No se pudo calcular la ruta.');
+    if (!res.ok || !d?.features?.[0]) {
+      console.error(`[rutas] OpenRouteService respondió ${res.status}`, d?.error ?? '');
+      throw new Error(`ORS ${res.status}`);
+    }
+    const f = d.features[0];
     const segs: Array<{ distance?: number; duration?: number }> = f.properties?.segments ?? [];
+    const dist = (f.properties?.summary?.distance ?? 0) / 1000, dur = (f.properties?.summary?.duration ?? 0) / 60;
     return {
-      distanceKm: (f.properties?.summary?.distance ?? 0) / 1000,
-      durationMin: (f.properties?.summary?.duration ?? 0) / 60,
-      legs: segs.length
-        ? segs.map((sg) => ({ distanceKm: (sg.distance ?? 0) / 1000, durationMin: (sg.duration ?? 0) / 60 }))
-        : [{ distanceKm: (f.properties?.summary?.distance ?? 0) / 1000, durationMin: (f.properties?.summary?.duration ?? 0) / 60 }],
+      provider: 'OpenRouteService · © OpenStreetMap',
+      distanceKm: dist,
+      durationMin: dur,
+      legs: segs.length ? segs.map((sg) => ({ distanceKm: (sg.distance ?? 0) / 1000, durationMin: (sg.duration ?? 0) / 60 })) : [{ distanceKm: dist, durationMin: dur }],
       geometry: f.geometry.coordinates,
     };
   } finally {
@@ -70,21 +75,37 @@ async function ors(points: LatLng[]): Promise<RouteCore> {
 
 async function osrm(points: LatLng[]): Promise<RouteCore> {
   const coords = points.map((p) => `${p.lng.toFixed(5)},${p.lat.toFixed(5)}`).join(';');
-  const key = coords;
+  const r = await fetchJson<{ code: string; routes?: Array<{ distance: number; duration: number; legs: Array<{ distance: number; duration: number }>; geometry: { coordinates: Array<[number, number]> } }> }>(
+    `${OSRM}/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`,
+    { timeoutMs: 15_000, retries: 1 },
+  );
+  if (r.code === 'NoRoute') throw new RouteUserError('No hay ruta por carretera entre esos puntos.');
+  if (r.code !== 'Ok' || !r.routes?.length) throw new Error('No se pudo calcular la ruta.');
+  const route = r.routes[0];
+  return {
+    provider: 'OSRM · © OpenStreetMap',
+    distanceKm: route.distance / 1000,
+    durationMin: route.duration / 60,
+    legs: route.legs.map((l) => ({ distanceKm: l.distance / 1000, durationMin: l.duration / 60 })),
+    geometry: route.geometry.coordinates,
+  };
+}
+
+/** OpenRouteService si hay clave; si falla (caída, límite, clave), servidor de reserva OSRM. Con caché por ruta. */
+async function route(points: LatLng[]): Promise<RouteCore> {
+  const key = points.map((p) => `${p.lng.toFixed(5)},${p.lat.toFixed(5)}`).join(';');
   if (!cache.has(key)) {
-    cache.set(key, ORS_KEY ? ors(points) : (async () => {
-      const r = await fetchJson<{ code: string; message?: string; routes?: Array<{ distance: number; duration: number; legs: Array<{ distance: number; duration: number }>; geometry: { coordinates: Array<[number, number]> } }> }>(
-        `${OSRM}/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`,
-        { timeoutMs: 20_000, retries: 1 },
-      );
-      if (r.code !== 'Ok' || !r.routes?.length) throw new Error(r.code === 'NoRoute' ? 'No hay ruta por carretera entre esos puntos.' : 'No se pudo calcular la ruta.');
-      const route = r.routes[0];
-      return {
-        distanceKm: route.distance / 1000,
-        durationMin: route.duration / 60,
-        legs: route.legs.map((l) => ({ distanceKm: l.distance / 1000, durationMin: l.duration / 60 })),
-        geometry: route.geometry.coordinates,
-      };
+    cache.set(key, (async () => {
+      if (ORS_KEY) {
+        try { return await ors(points); } catch (e) {
+          if (e instanceof RouteUserError) throw e;
+          console.warn('[rutas] OpenRouteService no disponible; se usa OSRM:', (e as Error).message);
+        }
+      }
+      try { return await osrm(points); } catch (e) {
+        if (e instanceof RouteUserError) throw e;
+        throw new Error('El servicio de rutas no responde ahora mismo. Inténtalo de nuevo en unos minutos.');
+      }
     })());
     if (cache.size > 300) cache.delete(cache.keys().next().value!);
     cache.get(key)!.catch(() => cache.delete(key));
@@ -118,7 +139,7 @@ function thin(geom: Array<[number, number]>, max = 1200) {
 }
 
 export async function planRoute(points: LatLng[], fuel: string, corridorKm = 2) {
-  const core = await osrm(points);
+  const core = await route(points);
   const snap = await getSnapshot();
   const samples = sample(core.geometry, 0.8);
   const found = new Map<number, RouteStation>();
@@ -144,7 +165,7 @@ export async function planRoute(points: LatLng[], fuel: string, corridorKm = 2) 
   const stats = priceStats(all.map((s) => s.priceMilli));
   const cheapest = [...all].sort((a, b) => a.priceMilli - b.priceMilli || a.offRouteKm - b.offRouteKm).slice(0, 8);
   return {
-    meta: { source: 'MITECO', sourceTime: snap.sourceTime, routing: ROUTING_PROVIDER },
+    meta: { source: 'MITECO', sourceTime: snap.sourceTime, routing: core.provider },
     distanceKm: core.distanceKm,
     durationMin: core.durationMin,
     legs: core.legs,
