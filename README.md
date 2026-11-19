@@ -56,3 +56,9 @@ Los pasos para Railway, el dominio, PWABuilder y Google Play están en [DEPLOY.m
 - Consumo de los coches: Agencia Europea de Medio Ambiente (CC BY 4.0).
 - Direcciones: CartoCiudad, © Instituto Geográfico Nacional (CC BY 4.0).
 - Mapa y rutas: © colaboradores de OpenStreetMap (ODbL), vía OpenFreeMap y OpenRouteService/OSRM.
+
+## Usarlo en el PC, sin Vercel
+
+Doble clic en `Iniciar.bat` → se abre en http://localhost:3002. Necesita [Node.js](https://nodejs.org) 22 o superior y Git.
+Cada vez que lo abres se actualiza desde GitHub, instala y compila solo si hay cambios (la primera vez tarda unos minutos) y abre el navegador. Opcional: para las rutas de la pestaña Viaje, pon tu clave de openrouteservice.org en `Iniciar.bat` (`set ORS_API_KEY=…`). Las cachés se guardan en `data/`.
+
